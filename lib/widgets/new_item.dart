@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_5/data/categories.dart';
 import 'package:flutter_application_5/models/category.dart';
+import 'package:flutter_application_5/models/grocery_item.dart';
 import 'package:http/http.dart' as http;
 
 class NewItem extends StatefulWidget {
@@ -27,7 +28,7 @@ class _NewItemState extends State<NewItem> {
         'fluttershoppinglist-524de-default-rtdb.europe-west1.firebasedatabase.app',
         'shopping-list.json',
       );
-      await http.post(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -36,10 +37,20 @@ class _NewItemState extends State<NewItem> {
           'category': _selectedCategory.title,
         }),
       );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+
       if (!context.mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        GroceryItem(
+          id: resData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory,
+        ),
+      );
     }
   }
 
